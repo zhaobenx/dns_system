@@ -3,7 +3,7 @@ project(dns_pj C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(test_dns main.c dns.h dns.c)
-add_executable(client client.c dns.h dns.c)
+#add_executable(test_dns main.c dns.h dns.c)
 add_executable(server server.c dns.h dns.c)
 add_executable(localServer localServer.c dns.h dns.c)
+add_executable(client client.c dns.h dns.c)

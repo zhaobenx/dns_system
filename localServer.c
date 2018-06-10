@@ -94,8 +94,6 @@ DNSBody *queryFromServer(int socket_handler, DNSQuery *dnsQuery, char *dns_serve
     {
         perror("receive socket");
         return NULL;
-
-        // todo
     }
 
     return deserializeDNS(buf, ret);

@@ -86,7 +86,7 @@ typedef struct List
 
 #define C_IN 1;
 
-#define DNS_PORT 5333
+#define DNS_PORT 53
 #define BUF_SIZE 1024
 
 typedef struct DNSCache
