@@ -1,0 +1,13 @@
+# 127.4.4.1, 商业组织
+谷歌.商业, 86400, IN, A, 127.4.4.1
+
+维基百科.组织, 86400, IN, A, 127.4.4.1
+
+微软.商业, 86400, IN, A, 127.4.4.1
+帮助.微软.商业, 86400, IN, A, 127.4.4.1
+互联网工程任务组.组织, 86400, IN, A, 127.4.4.1
+baidu.com,86400, IN, A, 127.4.4.1
+www.baidu.com,86400, IN, A, 127.4.4.1
+mail.baidu.com,86400, IN, A, 127.4.4.1
+www.baidu.com,86400, IN, MX, mail.baidu.com
+www.baidu.com,86400, IN, CNAME, www3.baidu.com
