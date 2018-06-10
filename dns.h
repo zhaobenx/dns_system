@@ -107,7 +107,7 @@ char *serilizeRr(DNSRr *dnsRr, int *length);
 
 char *serilizeDNS(DNSBody dnsBody, size_t *packetLength);
 
-DNSBody deserializeDNS(char *data, size_t length);
+DNSBody *deserializeDNS(char *data, size_t length);
 
 void releaseDNS(DNSBody dnsBody);
 

@@ -238,7 +238,15 @@ int main(int argc, char **argv)
             continue;
         }
 
-        DNSBody dnsBody = deserializeDNS(buf, received);
+        DNSBody dnsBody;
+        DNSBody *temp = deserializeDNS(buf, received);
+        if (temp == NULL)
+        {
+            printf("Error receiving client message.\n");
+            continue;
+        }
+        memcpy(&dnsBody, temp, sizeof(DNSBody));
+        free(temp);
         DNSBody response;
         DNSQuery *dnsQuery;
         DNSCache *databaseResult;
@@ -275,7 +283,7 @@ int main(int argc, char **argv)
 
                     if (databaseResult->type == T_MX)
                     {
-                        DNSCache *mxAddress = get_result(databse, dnsQuery->name, T_A);
+                        DNSCache *mxAddress = get_result(databse, databaseResult->result, T_A);
                         if (mxAddress)
                         {
                             response.dnsHeader.AdditionalRRs++;
@@ -284,6 +292,7 @@ int main(int argc, char **argv)
                             strcpy(dnsAdditional->name, mxAddress->query);
                             strcpy(dnsAdditional->data, mxAddress->result);
                             dnsAdditional->class = mxAddress->class_;
+
                             response.additional = dnsAdditional;
                         }
                     }

@@ -182,7 +182,7 @@ DNSQuery *deserilizeQuery(char *dnsQuery, int *length)
     result->class = ntohs(*(unsigned short *) ptr);
     ptr += 2;
 
-//    *length = ptr - (char *) result +1;
+    *length = ptr - dnsQuery;
     return result;
 }
 
@@ -252,7 +252,7 @@ DNSRr *deserilizeRr(char *dnsQuery, int *length)
 {
 
     char *name = toLocalFormat(dnsQuery);
-    DNSRr *result = (DNSRr *) malloc(sizeof(DNSQuery) + 2);
+    DNSRr *result = (DNSRr *) malloc(sizeof(DNSRr) + 2);
     checkMalloc(result);
     char *ptr = dnsQuery;
     strcpy(result->name, name);
@@ -276,22 +276,29 @@ DNSRr *deserilizeRr(char *dnsQuery, int *length)
         struct in_addr in = {};
         in.s_addr = ip;
 //        printf("IP: %s\n", inet_ntoa(in));
-        data = inet_ntoa(in);
+        strcpy(result->data, inet_ntoa(in));
+        ptr += 4;
+    } else if (result->type == T_MX)
+    {
+        ptr += 2;
+        strcpy(result->data, toLocalFormat(ptr));
+        ptr += strlen(ptr) + 1;
     } else
     {
 
-        data = toLocalFormat(ptr);
-        ptr += strlen(ptr);
+        strcpy(result->data, toLocalFormat(ptr));
+
+        ptr += strlen(ptr) + 1;
     }
 
-//    *length = ptr - (char *) result + 1;
+    *length = ptr - dnsQuery;
     return result;
 }
 
-DNSBody deserializeDNS(char *data, size_t packetlength)
+DNSBody *deserializeDNS(char *data, size_t packetlength)
 {
-//    if (packetlength < sizeof(DNSHeader))
-//        return NULL;
+    if (packetlength < sizeof(DNSHeader))
+        return NULL;
     DNSBody result;
     memset(&result, 0, sizeof(DNSBody));
     memcpy(&result.dnsHeader, data, sizeof(DNSHeader));
@@ -299,6 +306,9 @@ DNSBody deserializeDNS(char *data, size_t packetlength)
     ptr += sizeof(DNSHeader);
 
 
+    if (!((result.dnsHeader.opcode == 0x0) &&
+          (result.dnsHeader.zero == 0x0)))
+        return NULL;
     int questions = result.dnsHeader.Questions = ntohs(result.dnsHeader.Questions);
     int answers = result.dnsHeader.AnswerRRs = ntohs(result.dnsHeader.AnswerRRs);
     int additionals = result.dnsHeader.AdditionalRRs = ntohs(result.dnsHeader.AdditionalRRs);
@@ -321,8 +331,8 @@ DNSBody deserializeDNS(char *data, size_t packetlength)
 
     if (answers)
     {
-        DNSRr *dnsRr = (DNSRr *) malloc(sizeof(DNSRr) * questions);
-        for (int i = 0; i < questions; ++i)
+        DNSRr *dnsRr = (DNSRr *) malloc(sizeof(DNSRr) * answers);
+        for (int i = 0; i < answers; ++i)
         {
             DNSRr *temp = deserilizeRr(ptr, &length);
             memcpy(dnsRr + i, temp, sizeof(DNSRr));
@@ -333,8 +343,8 @@ DNSBody deserializeDNS(char *data, size_t packetlength)
     }
     if (additionals)
     {
-        DNSRr *dnsRr = (DNSRr *) malloc(sizeof(DNSRr) * questions);
-        for (int i = 0; i < questions; ++i)
+        DNSRr *dnsRr = (DNSRr *) malloc(sizeof(DNSRr) * additionals);
+        for (int i = 0; i < additionals; ++i)
         {
             DNSRr *temp = deserilizeRr(ptr, &length);
             memcpy(dnsRr + i, temp, sizeof(DNSRr));
@@ -344,7 +354,9 @@ DNSBody deserializeDNS(char *data, size_t packetlength)
         result.additional = dnsRr;
     }
 
-    return result;
+    DNSBody *temp = (DNSBody *) malloc(sizeof(DNSBody));
+    memcpy(temp, &result, sizeof(DNSBody));
+    return temp;
 }
 
 void releaseDNS(DNSBody dnsBody)
