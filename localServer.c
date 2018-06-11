@@ -140,7 +140,7 @@ char **splitUrl(char *url)
         ptr--;
     }
 
-    result_ptr = NULL;
+    *result_ptr = NULL;
     return result;
 }
 
