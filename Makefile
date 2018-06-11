@@ -20,5 +20,8 @@ test:
 	sudo ./server 127.5.5.1 >> 127.5.5.1/log&
 	sudo ./server 127.6.6.1 >> 127.6.6.1/log&
 	
-	sudo ./localServer
 	echo "Open another shell and run ./client www.baidu.com to test"
+	echo "./client -mx www.baidu.com "
+	echo "./client -mx 北邮.教育.中国 "
+	echo "./client 北邮.教育.中国 "
+	sudo ./localServer
